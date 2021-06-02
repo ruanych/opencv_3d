@@ -10,9 +10,9 @@ This repository implements some algorithms related to point clouds and is develo
 ```shell
 git clone https://github.com/Ryyyc/opencv_3d.git
 mkdir opencv_3d/build && cd opencv_3d/build
-cmake ../
+cmake ..
 make
-./opencv_3d
+./opencv_3d ../samples/Cassette_GT_.ply-sampled-0.2.ply
 ```
 
 Please make sure to have an OpenCV environment, or see [OpenCV installation tutorial](https://docs.opencv.org/4.5.1/df/d65/tutorial_table_of_content_introduction.html).
