@@ -38,6 +38,30 @@ bool checkPlaneNormalSame(cv::Vec4f &actual_plane, cv::Vec3f &expect_normal, dou
  */
 bool checkPlaneSame(cv::Vec4f &p1, cv::Vec4f &p2, double thr);
 
+/**
+ * @brief Get plane inliers
+ *
+ * @param plane_coeffs Plane coefficient  ax + by + cz + d = 0
+ * @param input_pts Point cloud data
+ * @param thr The point is plane inlier if the distance from the point to the plane is less than the threshold
+ * @param inliers  mark inliers, corresponds to the index of input_pts, true represents is inlier
+ * @return Number of inliers
+ */
+int getPlaneInliers(const cv::Vec4f &plane_coeffs, const cv::Mat &input_pts, float thr,
+                    std::vector<bool> &inliers);
+
+/**
+ * @brief Get plane inlier indexes
+ *
+ * @param plane_coeffs Plane coefficient  ax + by + cz + d = 0
+ * @param input_pts Point cloud data
+ * @param thr The point is plane inlier if the distance from
+ *                 the point to the plane is less than the threshold
+ * @param inliers  inlier indexes, corresponds to the index of input_pts
+ * @return Number of inliers
+ */
+int getPlaneInlierIdxs(const cv::Vec4f &plane_coeffs, const cv::Mat &input_pts, float thr,
+                       std::vector<int> &inliers);
     } // _3d::
 } // cv::
 

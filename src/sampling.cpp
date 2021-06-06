@@ -1,9 +1,8 @@
 #include "opencv2/opencv_3d/sampling.hpp"
 #include <unordered_map>
-#include <cmath>
 
 namespace cv {
-    namespace _3d {
+namespace _3d {
 
 void voxelGrid(cv::InputArray &input_pts, const float length, const float width,
                const float height, cv::OutputArray &sampled_pts)
@@ -59,8 +58,8 @@ void voxelGrid(cv::InputArray &input_pts, const float length, const float width,
     typedef long long keyType;
     std::unordered_map<keyType, std::vector<int>> grids;
 
-//            int init_size = ori_pts_size * 0.02;
-//            grids.reserve(init_size);
+//    int init_size = ori_pts_size * 0.02;
+//    grids.reserve(init_size);
 
     // Divide points into different grids
 
@@ -94,34 +93,39 @@ void voxelGrid(cv::InputArray &input_pts, const float length, const float width,
 
     for (int label_id = 0; label_id < pts_new_size; ++label_id, ++grid_iter)
     {
-        // Calculate the centroid position
-        float sum_x = 0, sum_y = 0, sum_z = 0;
-        for (const int &item : grid_iter->second)
-        {
-            float *const ptr_base = ori_pts_ptr + 3 * item;
-            sum_x += *(ptr_base);
-            sum_y += *(ptr_base + 1);
-            sum_z += *(ptr_base + 2);
-        }
+        std::vector<int> grid_pts = grid_iter->second;
         int grid_pts_cnt = static_cast<int>(grid_iter->second.size());
-        float centroid_x = sum_x / grid_pts_cnt, centroid_y = sum_y / grid_pts_cnt, centroid_z =
-                sum_z / grid_pts_cnt;
-
-        // Find the point closest to the centroid
-        float *sampled_ptr_base;
-        float min_dist_square = FLT_MAX;
-        for (const int &item : grid_iter->second)
+        float *sampled_ptr_base = ori_pts_ptr + 3 * grid_pts[0];
+        if (grid_pts_cnt > 2)
         {
-            float *const ptr_base = ori_pts_ptr + item * 3;
-            float x = *(ptr_base), y = *(ptr_base + 1), z = *(ptr_base + 2);
-
-            float dist_square = (x - centroid_x) * (x - centroid_x) +
-                                (y - centroid_y) * (y - centroid_y) +
-                                (z - centroid_z) * (z - centroid_z);
-            if (dist_square < min_dist_square)
+            // Calculate the centroid position
+            float sum_x = 0, sum_y = 0, sum_z = 0;
+            for (const int &item : grid_pts)
             {
-                min_dist_square = dist_square;
-                sampled_ptr_base = ptr_base;
+                float *const ptr_base = ori_pts_ptr + 3 * item;
+                sum_x += *(ptr_base);
+                sum_y += *(ptr_base + 1);
+                sum_z += *(ptr_base + 2);
+            }
+
+            float centroid_x = sum_x / grid_pts_cnt, centroid_y = sum_y / grid_pts_cnt, centroid_z =
+                    sum_z / grid_pts_cnt;
+
+            // Find the point closest to the centroid
+            float min_dist_square = FLT_MAX;
+            for (const int &item : grid_pts)
+            {
+                float *const ptr_base = ori_pts_ptr + item * 3;
+                float x = *(ptr_base), y = *(ptr_base + 1), z = *(ptr_base + 2);
+
+                float dist_square = (x - centroid_x) * (x - centroid_x) +
+                                    (y - centroid_y) * (y - centroid_y) +
+                                    (z - centroid_z) * (z - centroid_z);
+                if (dist_square < min_dist_square)
+                {
+                    min_dist_square = dist_square;
+                    sampled_ptr_base = ptr_base;
+                }
             }
         }
 
@@ -133,5 +137,5 @@ void voxelGrid(cv::InputArray &input_pts, const float length, const float width,
 
 } // voxelGrid()
 
-    } // _3d::
+} // _3d::
 } // cv::

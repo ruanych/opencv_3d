@@ -18,7 +18,8 @@ namespace cv {
  * @param height  Grid height
  * @param sampled_pts  Point cloud after sampling
  */
-void voxelGrid(cv::InputArray &input_pts, float length, float width, float height, cv::OutputArray &sampled_pts);
+void voxelGrid(cv::InputArray &input_pts, float length, float width, float height,
+               cv::OutputArray &sampled_pts);
 
     } // _3d::
 } // cv::

@@ -3,7 +3,7 @@
 namespace cv {
     namespace _3d {
 
-bool save_points_label(const std::string &file_path, cv::InputArray &labels, bool sync_io = false)
+bool save_points_label(const std::string &file_path, cv::InputArray &labels, bool sync_io)
 {
     cv::Mat labels_m = labels.getMat();
 
@@ -32,7 +32,7 @@ bool save_points_label(const std::string &file_path, cv::InputArray &labels, boo
 } // save_points_label()
 
 
-bool save_point_cloud_ply(const std::string &file_path, cv::InputArray &input_pts, bool sync_io = false)
+bool save_point_cloud_ply(const std::string &file_path, cv::InputArray &input_pts, bool sync_io)
 {
     cv::Mat pts_m = input_pts.getMat();
     int size = pts_m.rows;
@@ -75,7 +75,7 @@ bool save_point_cloud_ply(const std::string &file_path, cv::InputArray &input_pt
 } // save_point_cloud_ply()
 
 bool
-read_point_cloud_ply_to_mat(const std::string &file_path, cv::OutputArray &output_pts, bool sync_io = false)
+read_point_cloud_ply_to_mat(const std::string &file_path, cv::OutputArray &output_pts, bool sync_io)
 {
     std::ios::sync_with_stdio(sync_io);
 
