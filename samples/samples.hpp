@@ -4,9 +4,13 @@
 namespace cv {
 namespace _3d {
 
-void sampling_sample(const std::string &test_file_path, float grid_size);
+void voxelGridSamplingSample(const std::string &test_file_path, float grid_size);
 
-void total_least_squares_sample();
+void randomSamplingSample(const std::string &test_file_path, float sampled_scale);
+
+void farthestPointSamplingSample(const std::string &test_file_path, float sampled_scale);
+
+void totalLeastSquaresSample();
 
 void ransacFitPlanesSample(const std::string &test_file_path, float thr, int desired_num_planes, int max_iters, float grid_size);
 

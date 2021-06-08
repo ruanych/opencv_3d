@@ -68,6 +68,24 @@ Creates a 3D voxel grid (a set of tiny 3D boxes in space) over the input point c
 
 <br>
 
+### Random Sampling
+
+Randomly select some points from point cloud as sampling results.
+
+<br>
+
+### Farthest Point Sampling (FPS)
+
+The farthest point sampling is a kind of uniform sampling, and the sampling points are generally distributed near the boundary of the point cloud. The basic steps:
+
+1. The input point cloud is denoted as set `C`, the sampling point is denoted as set `S`, and `S` is initialized as an empty set.
+
+2. Randomly select a seed point and put it in `S`.
+
+3. Sampling one point at a time, put in `S`. The method of sampling is to find a point that is farthest from the set `S` in the set `C - S` (point in `C` but not in `S`). The distance from a point to the point cloud set is the smallest distance from this point to all points in the set.
+
+<br>
+
 ### Total Least Squares Plane Estimate
 
 Fit the plane by the Total Least Squares.

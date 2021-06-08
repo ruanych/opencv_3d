@@ -4,6 +4,35 @@
 namespace cv {
 namespace _3d {
 
+template<typename Tp>
+static inline void swap(Tp &n, Tp &m)
+{
+    Tp tmp = n;
+    n = m;
+    m = tmp;
+}
+
+
+inline void getMatFromInputArray(cv::InputArray &input_pts, cv::Mat &mat)
+{
+    if (input_pts.isMat())
+    {
+        mat = input_pts.getMat();
+        if (mat.channels() != 1)
+            mat = mat.reshape(1, static_cast<int>(mat.total())); // Convert to single channel
+        if (mat.cols != 3 && mat.rows == 3)
+            cv::transpose(mat, mat);
+
+        CV_CheckEQ(mat.cols, 3, "Invalid dimension of point cloud");
+        if (mat.type() != CV_32F)
+            mat.convertTo(mat, CV_32F);// Use float to store data
+    }
+    else
+    {
+        mat = cv::Mat(static_cast<int>(mat.total()), 3, CV_32F, mat.data);
+    }
+}
+
 void voxelGrid(cv::InputArray &input_pts, const float length, const float width,
                const float height, cv::OutputArray &sampled_pts)
 {
@@ -13,22 +42,7 @@ void voxelGrid(cv::InputArray &input_pts, const float length, const float width,
 
     // Get input point cloud data
     cv::Mat ori_pts;
-    if (input_pts.isMat())
-    {
-        ori_pts = input_pts.getMat();
-        if (ori_pts.channels() != 1)
-            ori_pts = ori_pts.reshape(1, static_cast<int>(ori_pts.total())); // Convert to single channel
-        if (ori_pts.cols != 3 && ori_pts.rows == 3)
-            cv::transpose(ori_pts, ori_pts);
-
-        CV_CheckEQ(ori_pts.cols, 3, "Invalid dimension of point cloud");
-        if (ori_pts.type() != CV_32F)
-            ori_pts.convertTo(ori_pts, CV_32F);// Use float to store data
-    }
-    else
-    {
-        ori_pts = cv::Mat(static_cast<int>(ori_pts.total()), 3, CV_32F, ori_pts.data);
-    }
+    getMatFromInputArray(input_pts, ori_pts);
 
     const int ori_pts_size = ori_pts.rows;
 
@@ -136,6 +150,129 @@ void voxelGrid(cv::InputArray &input_pts, const float length, const float width,
     }
 
 } // voxelGrid()
+
+void randomSampling(cv::InputArray &input_pts, const int sampled_pts_size, cv::OutputArray &sampled_pts)
+{
+    CV_CheckGT(sampled_pts_size, 0, "The point cloud size after sampling must be greater than 0.");
+
+    // Get input point cloud data
+    cv::Mat ori_pts;
+    getMatFromInputArray(input_pts, ori_pts);
+
+    const int ori_pts_size = ori_pts.rows;
+    CV_CheckLT(sampled_pts_size, ori_pts_size,
+               "The sampled point cloud size must be smaller than the original point cloud size.");
+
+    std::vector<int> pts_idxs(ori_pts_size);
+    for (int i = 0; i < ori_pts_size; ++i) pts_idxs[i] = i;
+    cv::randShuffle(pts_idxs);
+
+    sampled_pts.create(sampled_pts_size, 3, CV_32F);
+
+    float *const ori_pts_ptr = (float *) ori_pts.data;
+    float *const sampled_pts_ptr = (float *) sampled_pts.getMat().data;
+    for (int i = 0; i < sampled_pts_size; ++i)
+    {
+        float *const ori_pts_ptr_base = ori_pts_ptr + pts_idxs[i] * 3;
+        float *const sampled_pts_ptr_base = sampled_pts_ptr + i * 3;
+        *(sampled_pts_ptr_base) = *(ori_pts_ptr_base);
+        *(sampled_pts_ptr_base + 1) = *(ori_pts_ptr_base + 1);
+        *(sampled_pts_ptr_base + 2) = *(ori_pts_ptr_base + 2);
+    }
+
+} // randomSampling()
+
+void randomSampling(cv::InputArray &input_pts, const float sampled_scale, cv::OutputArray &sampled_pts)
+{
+    CV_CheckGT(sampled_scale, 0.0f, "The point cloud sampled scale must greater than 0.");
+    CV_CheckLT(sampled_scale, 1.0f, "The point cloud sampled scale must less than 1.");
+    cv::Mat ori_pts;
+    getMatFromInputArray(input_pts, ori_pts);
+    randomSampling(input_pts, cvCeil(sampled_scale * ori_pts.rows), sampled_pts);
+} // randomSampling()
+
+void farthestPointSampling(cv::InputArray &input_pts, const int sampled_pts_size,
+                           cv::OutputArray &sampled_pts, const float dist_lower_limit)
+{
+    CV_CheckGT(sampled_pts_size, 0, "The point cloud size after sampling must be greater than 0.");
+    CV_CheckGE(dist_lower_limit, 0.0f, "The distance lower bound must be greater than or equal to 0.");
+
+    // Get input point cloud data
+    cv::Mat ori_pts;
+    getMatFromInputArray(input_pts, ori_pts);
+
+    const int ori_pts_size = ori_pts.rows;
+    CV_CheckLT(sampled_pts_size, ori_pts_size,
+               "The sampled point cloud size must be smaller than the original point cloud size.");
+
+
+    int *idxs = new int[ori_pts_size];
+    float *dist_square = new float[ori_pts_size];
+    for (int i = 0; i < ori_pts_size; ++i)
+    {
+        idxs[i] = i;
+        dist_square[i] = FLT_MAX;
+    }
+
+    int seed = cv::randu<int>() % ori_pts_size;
+    idxs[0] = seed;
+    idxs[seed] = 0;
+
+    sampled_pts.create(sampled_pts_size, 3, CV_32F);
+    float *const sampled_pts_ptr = (float *) sampled_pts.getMat().data;
+    float *const ori_pts_ptr = (float *) ori_pts.data;
+    int sampled_cnt = 1;
+    const float dist_lower_limit_square = dist_lower_limit * dist_lower_limit;
+    while (sampled_cnt < sampled_pts_size)
+    {
+        int last_pt = sampled_cnt - 1;
+        float *const last_pt_ptr_base = ori_pts_ptr + 3 * idxs[last_pt];
+        float *const sampled_pts_ptr_base = sampled_pts_ptr + 3 * last_pt;
+        float last_pt_x = *last_pt_ptr_base, last_pt_y = *(last_pt_ptr_base + 1), last_pt_z = *(last_pt_ptr_base + 2);
+        *sampled_pts_ptr_base = last_pt_x;
+        *(sampled_pts_ptr_base + 1) = last_pt_y;
+        *(sampled_pts_ptr_base + 2) = last_pt_z;
+
+        float max_dist_square = 0;
+        for (int i = sampled_cnt; i < ori_pts_size; ++i)
+        {
+            float *const ori_pts_ptr_base = ori_pts_ptr + 3 * idxs[i];
+            float x_diff = (last_pt_x - *ori_pts_ptr_base);
+            float y_diff = (last_pt_y - *(ori_pts_ptr_base + 1));
+            float z_diff = (last_pt_z - *(ori_pts_ptr_base + 2));
+            float next_dist_square = x_diff * x_diff + y_diff * y_diff + z_diff * z_diff;
+            if (next_dist_square < dist_square[i])
+            {
+                dist_square[i] = next_dist_square;
+            }
+            if (dist_square[i] > max_dist_square)
+            {
+                last_pt = i;
+                max_dist_square = dist_square[i];
+            }
+        }
+
+        if (max_dist_square < dist_lower_limit_square) break;
+
+        cv::_3d::swap(idxs[sampled_cnt], idxs[last_pt]);
+        cv::_3d::swap(dist_square[sampled_cnt], dist_square[last_pt]);
+        ++sampled_cnt;
+    }
+    delete[] dist_square;
+    delete[] idxs;
+} // farthestPointSampling()
+
+void farthestPointSampling(cv::InputArray &input_pts, const float sampled_scale,
+                           cv::OutputArray &sampled_pts, const float dist_lower_limit)
+{
+    CV_CheckGT(sampled_scale, 0.0f, "The point cloud sampled scale must greater than 0.");
+    CV_CheckLT(sampled_scale, 1.0f, "The point cloud sampled scale must less than 1.");
+    CV_CheckGE(dist_lower_limit, 0.0f, "The distance lower bound must be greater than or equal to 0.");
+    cv::Mat ori_pts;
+    getMatFromInputArray(input_pts, ori_pts);
+    farthestPointSampling(input_pts, cvCeil(sampled_scale * ori_pts.rows),
+                          sampled_pts, dist_lower_limit);
+} // farthestPointSampling()
 
 } // _3d::
 } // cv::

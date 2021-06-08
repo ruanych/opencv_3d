@@ -9,13 +9,13 @@
 namespace cv {
 namespace _3d {
 
-void sampling_sample(const std::string &test_file_path, float grid_size)
+void voxelGridSamplingSample(const std::string &test_file_path, float grid_size)
 {
-    std::cout << "=========== SAMPLING ===========\n";
+    std::cout << "=========== VOXEL GRID SAMPLING ===========\n";
     if (grid_size > 0)
     {
         cv::Mat point_cloud;
-        if (read_point_cloud_ply_to_mat(test_file_path, point_cloud, false))
+        if (readPointCloudPlyToMat(test_file_path, point_cloud, false))
         {
             std::cout << "Read point cloud data successfully, point cloud size: " << point_cloud.size << std::endl;
 
@@ -25,10 +25,10 @@ void sampling_sample(const std::string &test_file_path, float grid_size)
             clock_t end = clock();
             std::cout << "After sampled, point cloud size: " << sampled_pts.size << std::endl;
             std::cout << "Sampling time cost: " << (1000.0 * (end - start)) / CLOCKS_PER_SEC << " ms" << std::endl;
-            if (save_point_cloud_ply(test_file_path + std::to_string(grid_size) + "-sampled.ply", sampled_pts, true))
+            if (savePointCloudPly(test_file_path + std::to_string(grid_size) + "-voxel-sampled.ply", sampled_pts, true))
             {
                 std::cout << "Save sampled point cloud successful, location: "
-                          << test_file_path + std::to_string(grid_size) + "-sampled.ply" << std::endl;;
+                          << test_file_path + std::to_string(grid_size) + "-voxel-sampled.ply" << std::endl;;
             }
         }
     }
@@ -38,9 +38,73 @@ void sampling_sample(const std::string &test_file_path, float grid_size)
     }
 
     std::cout << "-----------------------------------\n\n";
-} // sampling_sample()
+} // voxelGridSamplingSample()
 
-void total_least_squares_sample()
+void randomSamplingSample(const std::string &test_file_path, float sampled_scale)
+{
+    std::cout << "=========== RANDOM SAMPLING ===========\n";
+    if (sampled_scale > 0 && sampled_scale < 1)
+    {
+        cv::Mat point_cloud;
+        if (readPointCloudPlyToMat(test_file_path, point_cloud, false))
+        {
+            std::cout << "Read point cloud data successfully, point cloud size: " << point_cloud.size << std::endl;
+
+            cv::Mat sampled_pts;
+            clock_t start = clock();
+            cv::_3d::randomSampling(point_cloud, sampled_scale, sampled_pts);
+            clock_t end = clock();
+            std::cout << "After sampled, point cloud size: " << sampled_pts.size << std::endl;
+            std::cout << "Sampling time cost: " << (1000.0 * (end - start)) / CLOCKS_PER_SEC << " ms" << std::endl;
+            if (savePointCloudPly(test_file_path + std::to_string(sampled_scale) + "-random-sampled.ply", sampled_pts,
+                                  true))
+            {
+                std::cout << "Save sampled point cloud successful, location: "
+                          << test_file_path + std::to_string(sampled_scale) + "-random-sampled.ply" << std::endl;;
+            }
+        }
+    }
+    else
+    {
+        std::cout << "Invalid sampled_scale." << std::endl;
+    }
+
+    std::cout << "-----------------------------------\n\n";
+} // randomSamplingSample()
+
+void farthestPointSamplingSample(const std::string &test_file_path, float sampled_scale)
+{
+    std::cout << "=========== FARTHEST POINT SAMPLING ===========\n";
+    if (sampled_scale > 0 && sampled_scale < 1)
+    {
+        cv::Mat point_cloud;
+        if (readPointCloudPlyToMat(test_file_path, point_cloud, false))
+        {
+            std::cout << "Read point cloud data successfully, point cloud size: " << point_cloud.size << std::endl;
+
+            cv::Mat sampled_pts;
+            clock_t start = clock();
+            cv::_3d::farthestPointSampling(point_cloud, sampled_scale, sampled_pts);
+            clock_t end = clock();
+            std::cout << "After sampled, point cloud size: " << sampled_pts.size << std::endl;
+            std::cout << "Sampling time cost: " << (1000.0 * (end - start)) / CLOCKS_PER_SEC << " ms" << std::endl;
+            if (savePointCloudPly(test_file_path + std::to_string(sampled_scale) + "-fps-sampled.ply", sampled_pts,
+                                  true))
+            {
+                std::cout << "Save sampled point cloud successful, location: "
+                          << test_file_path + std::to_string(sampled_scale) + "-fps-sampled.ply" << std::endl;;
+            }
+        }
+    }
+    else
+    {
+        std::cout << "Invalid sampled_scale." << std::endl;
+    }
+
+    std::cout << "-----------------------------------\n\n";
+} // farthestPointSamplingSample()
+
+void totalLeastSquaresSample()
 {
     std::cout << "=========== TOTAL LEAST SQUARES ===========\n";
     cv::Vec4f ori_coeffs(1.0f / cv::sqrt(3.0f), 1.0f / cv::sqrt(3.0f), 1.0f / cv::sqrt(3.0f), 1);
@@ -76,7 +140,7 @@ void total_least_squares_sample()
     std::cout << "Fitted plane equation coefficients: " << coeffs << std::endl;
     std::cout << "Plane fitting time cost: " << (1000.0 * (end - start)) / CLOCKS_PER_SEC << " ms" << std::endl;
     std::cout << "-----------------------------------\n\n";
-} // total_least_squares_sample()
+} // totalLeastSquaresSample()
 
 void ransacFitPlanesSample(const std::string &test_file_path, float thr, int desired_num_planes, int max_iters,
                            float grid_size)
@@ -87,7 +151,7 @@ void ransacFitPlanesSample(const std::string &test_file_path, float thr, int des
         return;
     }
     cv::Mat point_cloud;
-    if (read_point_cloud_ply_to_mat(test_file_path, point_cloud, false))
+    if (readPointCloudPlyToMat(test_file_path, point_cloud, false))
     {
         std::cout << "Read point cloud data successfully, point cloud size: " << point_cloud.size << std::endl;
 
@@ -109,7 +173,7 @@ void ransacFitPlanesSample(const std::string &test_file_path, float thr, int des
         std::cout << std::endl;
         std::cout << "Fit planes time cost: " << (1000.0 * (end - start)) / CLOCKS_PER_SEC << " ms" << std::endl;
 
-        if (save_points_label(test_file_path + "-labels.txt", labels, false))
+        if (savePointsLabel(test_file_path + "-labels.txt", labels, false))
         {
             std::cout << "Save label successful, location: " << test_file_path + "-labels.txt\n";
         }

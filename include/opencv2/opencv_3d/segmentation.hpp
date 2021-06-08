@@ -34,7 +34,8 @@ int ransacFitPlane(const cv::Mat &input_pts, float thr, int max_iterations, cv::
  * @param labels (Output) 0 means it does not belong to any plane,
  *               otherwise the plane is marked with a different number
  * @param desired_num_planes  Number of desired planes, default 1
- * @param grid_size  Sampling grid size, if not greater than 0, it means no sampling, default -1
+ * @param grid_size  Voxel Grid Filter Sampling grid size,
+ *                   if not greater than 0, it means no sampling, default -1
  * @param normal Normal vector constraint, nullptr means no constraint is used, otherwise
  *               the detected plane normal vector satisfies the constraint, default nullptr
  * @param normal_diff_thr Plane normal vector constraint error threshold,

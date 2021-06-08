@@ -16,7 +16,7 @@ namespace cv {
  * @param sync_io  IO synchronization
  * @return  true if saved successfully, otherwise false
  */
-bool save_points_label(const std::string &file_path, cv::InputArray &labels, bool sync_io = false);
+bool savePointsLabel(const std::string &file_path, cv::InputArray &labels, bool sync_io = false);
 
 /**
  * Save point cloud to .ply file
@@ -26,7 +26,7 @@ bool save_points_label(const std::string &file_path, cv::InputArray &labels, boo
  * @param sync_io  IO synchronization
  * @return  true if saved successfully, otherwise false
  */
-bool save_point_cloud_ply(const std::string &file_path, cv::InputArray &input_pts, bool sync_io = false);
+bool savePointCloudPly(const std::string &file_path, cv::InputArray &input_pts, bool sync_io = false);
 
 
 /**
@@ -37,7 +37,7 @@ bool save_point_cloud_ply(const std::string &file_path, cv::InputArray &input_pt
  * @param sync_io  IO synchronization
  * @return  true if read data successfully, otherwise false
  */
-bool read_point_cloud_ply_to_mat(const std::string &file_path, cv::OutputArray &output_pts, bool sync_io = false);
+bool readPointCloudPlyToMat(const std::string &file_path, cv::OutputArray &output_pts, bool sync_io = false);
 
     } // _3d::
 } // cv::
