@@ -15,9 +15,16 @@ static inline void swap(Tp &n, Tp &m)
 
 inline void getMatFromInputArray(cv::InputArray &input_pts, cv::Mat &mat)
 {
-    if (input_pts.isMat())
-    {
-        mat = input_pts.getMat();
+    cv::_InputArray::KindFlag kind = input_pts.kind();
+
+    CV_CheckType(kind, kind == _InputArray::STD_VECTOR || kind == _InputArray::MAT,
+                 "Point cloud data storage type should be vector of Point3 or Mat of size Nx3");
+
+    mat = input_pts.getMat();
+
+    if (kind == _InputArray::STD_VECTOR){
+        mat = cv::Mat(static_cast<int>(mat.total()), 3, CV_32F, mat.data);
+    } else {
         if (mat.channels() != 1)
             mat = mat.reshape(1, static_cast<int>(mat.total())); // Convert to single channel
         if (mat.cols != 3 && mat.rows == 3)
@@ -26,10 +33,6 @@ inline void getMatFromInputArray(cv::InputArray &input_pts, cv::Mat &mat)
         CV_CheckEQ(mat.cols, 3, "Invalid dimension of point cloud");
         if (mat.type() != CV_32F)
             mat.convertTo(mat, CV_32F);// Use float to store data
-    }
-    else
-    {
-        mat = cv::Mat(static_cast<int>(mat.total()), 3, CV_32F, mat.data);
     }
 }
 
@@ -69,7 +72,7 @@ void voxelGrid(cv::InputArray &input_pts, const float length, const float width,
         if (z_max < z) z_max = z;
     }
 
-    typedef long long keyType;
+    typedef int64_t keyType;
     std::unordered_map<keyType, std::vector<int>> grids;
 
 //    int init_size = ori_pts_size * 0.02;

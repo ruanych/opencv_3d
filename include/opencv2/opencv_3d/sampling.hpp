@@ -12,7 +12,7 @@ namespace _3d {
  * point cloud data, in each voxel (i.e., 3D box), all the points present will be
  * approximated (i.e., downsampled) with the point closest to their centroid.
  *
- * @param input_pts  Original point cloud
+ * @param input_pts  Original point cloud, vector of Point3 or Mat of size Nx3
  * @param length Grid length
  * @param width  Grid width
  * @param height  Grid height
@@ -24,7 +24,7 @@ void voxelGrid(cv::InputArray &input_pts, float length, float width, float heigh
 /**
  * @brief Point cloud sampling by randomly select points
  *
- * @param input_pts  Original point cloud
+ * @param input_pts  Original point cloud, vector of Point3 or Mat of size Nx3
  * @param sampled_pts_size The desired point cloud size after sampling
  * @param sampled_pts  Point cloud after sampling
  */
@@ -33,7 +33,7 @@ void randomSampling(cv::InputArray &input_pts, int sampled_pts_size, cv::OutputA
 /**
  * @brief Point cloud sampling by randomly select points
  *
- * @param input_pts  Original point cloud
+ * @param input_pts  Original point cloud, vector of Point3 or Mat of size Nx3
  * @param sampled_scale The percentage of the sampled point cloud to the original size,
  *                      that is, sampled size = original size * sampled_scale, range (0, 1)
  * @param sampled_pts  Point cloud after sampling
@@ -47,7 +47,7 @@ void randomSampling(cv::InputArray &input_pts, float sampled_scale, cv::OutputAr
  * 2. Find a point in C that is the farthest away from S and put it into S
  * The distance from point to S set is the smallest distance from point to all points in S
  *
- * @param input_pts  Original point cloud
+ * @param input_pts  Original point cloud, vector of Point3 or Mat of size Nx3
  * @param sampled_pts_size The desired point cloud size after sampling
  * @param sampled_pts  Point cloud after sampling
  * @param dist_lower_limit Sampling is terminated early if the distance from
@@ -59,7 +59,7 @@ void farthestPointSampling(cv::InputArray &input_pts, int sampled_pts_size,
 /**
  * @brief Details in farthestPointSampling(cv::InputArray, int, cv::OutputArray, float)
  *
- * @param input_pts  Original point cloud
+ * @param input_pts  Original point cloud, vector of Point3 or Mat of size Nx3
  * @param sampled_scale The percentage of the sampled point cloud to the original size,
  *                      that is, sampled size = original size * sampled_scale, range (0, 1)
  * @param sampled_pts  Point cloud after sampling

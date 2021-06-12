@@ -101,22 +101,23 @@ void ransacFitPlanes(cv::InputArray &input_pts, float thr, int max_iterations,
     CV_CheckGT(desired_num_planes, 0, "The number of desired planes_coeffs parameter must be greater than 0.");
 
     // Get input point cloud data
-    cv::Mat pts;
-    if (input_pts.isMat())
-    {
-        pts = input_pts.getMat();
+    cv::_InputArray::KindFlag kind = input_pts.kind();
+
+    CV_CheckType(kind, kind == _InputArray::STD_VECTOR || kind == _InputArray::MAT,
+                 "Point cloud data storage type should be vector of Point3 or Mat of size Nx3");
+
+    cv::Mat pts = input_pts.getMat();
+    if (kind == _InputArray::STD_VECTOR){
+        pts = cv::Mat(static_cast<int>(pts.total()), 3, CV_32F, pts.data);
+    } else {
         if (pts.channels() != 1)
-            pts = pts.reshape(1, static_cast<int>(pts.total()));// Convert to single channel
+            pts = pts.reshape(1, static_cast<int>(pts.total())); // Convert to single channel
         if (pts.cols != 3 && pts.rows == 3)
-            transpose(pts, pts);
+            cv::transpose(pts, pts);
 
         CV_CheckEQ(pts.cols, 3, "Invalid dimension of point cloud");
         if (pts.type() != CV_32F)
             pts.convertTo(pts, CV_32F);// Use float to store data
-    }
-    else
-    {
-        pts = cv::Mat(static_cast<int>(pts.total()), 3, CV_32F, pts.data);
     }
 
     // Plane fitted using Voxel Grid Filter Sampling point cloud

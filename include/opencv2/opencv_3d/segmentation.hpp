@@ -26,7 +26,7 @@ int ransacFitPlane(const cv::Mat &input_pts, float thr, int max_iterations, cv::
 /**
  * @brief Fit multiple planes
  *
- * @param input_pts  Point cloud data
+ * @param input_pts  Point cloud data, vector of Point3 or Mat of size Nx3
  * @param thr  The point is plane inlier if the distance from
  *                  the point to the plane is less than the threshold
  * @param max_iterations The maximum number of iterations for RANSAC

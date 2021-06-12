@@ -6,24 +6,34 @@ namespace _3d {
 bool totalLeastSquaresPlaneEstimate(const cv::Mat &input_pts, std::vector<int> &inlier_idxs,
                                     cv::Vec4f &plane_coeffs)
 {
+    CV_CheckTypeEQ(input_pts.type(), CV_32F, "The coordinate data type of the point cloud should be CV_32F");
+    CV_Check(inlier_idxs.size(), inlier_idxs.size() < INT_MAX,
+             "The number of plane inlier points must be less than or equal to point cloud size");
     const int inlier_cnt = static_cast<int>(inlier_idxs.size());
-    CV_CheckGT(inlier_cnt, 2, "The number of plane inlier must be greater than 2");
-    const float *pts_ptr = (float *) input_pts.data;
+    const int pts_size = input_pts.rows;
+    CV_CheckGT(inlier_cnt, 2, "The number of plane inlier points must be greater than 2");
+    CV_CheckLE(inlier_cnt, pts_size,
+               "The number of plane inlier points must be less than or equal to point cloud size");
+    for (int item: inlier_idxs)
+        CV_Check(item, item >= 0 && item < pts_size,
+                 "The inlier index must in range [0,  point cloud size)");
+
+    float *const pts_ptr = (float *) input_pts.data;
 
     // Judging the three points collinear
     if (3 == inlier_cnt)
     {
-        int id1 = 3 * inlier_idxs[0], id2 = 3 * inlier_idxs[1], id3 = 3 * inlier_idxs[2];
-        float x1 = pts_ptr[id1], y1 = pts_ptr[id1 + 1], z1 = pts_ptr[id1 + 2];
-        float x2 = pts_ptr[id2], y2 = pts_ptr[id2 + 1], z2 = pts_ptr[id2 + 2];
-        float x3 = pts_ptr[id3], y3 = pts_ptr[id3 + 1], z3 = pts_ptr[id3 + 2];
+        float *const p1_ptr_base = pts_ptr + 3 * inlier_idxs[0];
+        float *const p2_ptr_base = pts_ptr + 3 * inlier_idxs[1];
+        float *const p3_ptr_base = pts_ptr + 3 * inlier_idxs[2];
+        float x1 = *p1_ptr_base, y1 = *(p1_ptr_base + 1), z1 = *(p1_ptr_base + 2);
+        float x2 = *p2_ptr_base, y2 = *(p2_ptr_base + 1), z2 = *(p2_ptr_base + 2);
+        float x3 = *p3_ptr_base, y3 = *(p3_ptr_base + 1), z3 = *(p3_ptr_base + 2);
         cv::Vec3f ba(x1 - x2, y1 - y2, z1 - z2);
         cv::Vec3f ca(x1 - x3, y1 - y3, z1 - z3);
         float ba_dot_ca = fabs(ca.dot(ba));
         if (fabs(ba_dot_ca * ba_dot_ca - ba.dot(ba) * ca.dot(ca)) < 0.0001)
-        {
             return false;
-        }
     }
     double sum_x = 0, sum_y = 0, sum_z = 0;
     for (int i = 0; i < inlier_cnt; ++i)
@@ -39,10 +49,10 @@ bool totalLeastSquaresPlaneEstimate(const cv::Mat &input_pts, std::vector<int> &
     cv::Mat pd_mat;
     {
         cv::Mat U(inlier_cnt, 3, CV_32F);
-        float *U_ptr = (float *) U.data;
+        float * const U_ptr = (float *) U.data;
         for (int i = 0; i < inlier_cnt; ++i)
         {
-            float *ptr_base = (U_ptr + 3 * i);
+            float *ptr_base = U_ptr + 3 * i;
             const float *pts_ptr_base = pts_ptr + 3 * inlier_idxs[i];
             *ptr_base = *(pts_ptr_base) - mean_x;
             *(ptr_base + 1) = *(pts_ptr_base + 1) - mean_y;
@@ -52,16 +62,13 @@ bool totalLeastSquaresPlaneEstimate(const cv::Mat &input_pts, std::vector<int> &
         pd_mat = U.t() * U;
     }
 
-    cv::Mat eigenvalues;
     cv::Mat eigenvectors(3, 3, CV_32F);
-    cv::eigen(pd_mat, eigenvalues, eigenvectors);
+    cv::eigen(pd_mat, noArray(), eigenvectors);
     const float *eig_ptr = (float *) eigenvectors.data;
 
     float a = eig_ptr[6], b = eig_ptr[7], c = eig_ptr[8];
     if (std::isinf(a) || std::isinf(b) || std::isinf(c) || (a == 0 && b == 0 && c == 0))
-    {
         return false;
-    }
 
     plane_coeffs = cv::Vec4f(a, b, c, -a * mean_x - b * mean_y - c * mean_z);
     return true;
@@ -97,6 +104,7 @@ int getPlaneInliers(const cv::Vec4f &plane_coeffs, const cv::Mat &input_pts, flo
                     std::vector<bool> &inliers)
 {
     CV_CheckGT(thr, 0.0f, "The threshold parameter must be greater than 0.");
+    CV_CheckTypeEQ(input_pts.type(), CV_32F, "The coordinate data type of the point cloud should be CV_32F");
 
     const int pts_size = input_pts.rows;
     float *const pts_ptr = (float *) input_pts.data;
@@ -140,6 +148,7 @@ int getPlaneInlierIdxs(const cv::Vec4f &plane_coeffs, const cv::Mat &input_pts, 
                        std::vector<int> &inliers)
 {
     CV_CheckGT(thr, 0.0f, "The threshold parameter must be greater than 0.");
+    CV_CheckTypeEQ(input_pts.type(), CV_32F, "The coordinate data type of the point cloud should be CV_32F");
 
     const int pts_size = input_pts.rows;
     float *const pts_ptr = (float *) input_pts.data;
