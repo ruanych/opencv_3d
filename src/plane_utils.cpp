@@ -63,7 +63,8 @@ bool totalLeastSquaresPlaneEstimate(const cv::Mat &input_pts, std::vector<int> &
     }
 
     cv::Mat eigenvectors(3, 3, CV_32F);
-    cv::eigen(pd_mat, noArray(), eigenvectors);
+    cv::Mat eigenvalues;
+    cv::eigen(pd_mat, eigenvalues, eigenvectors);
     const float *eig_ptr = (float *) eigenvectors.data;
 
     float a = eig_ptr[6], b = eig_ptr[7], c = eig_ptr[8];
