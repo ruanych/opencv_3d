@@ -1,6 +1,5 @@
 #include <iostream>
 #include "samples/samples.hpp"
-#include "gtest/gtest.h"
 
 int main(int argc, char *argv[]) {
 
@@ -13,8 +12,7 @@ int main(int argc, char *argv[]) {
         cout << "3. Voxel grid filter sampling\n";
         cout << "4. Random sampling\n";
         cout << "5. Farthest point sampling\n";
-        cout << "6. Run test to check the algorithm\n";
-        cout << "Please select the sample to run:(1~6): ";
+        cout << "Please select the sample to run:(1~5): ";
 
         int num, max_iters, desired_num_planes;
         float grid_size, thr, sampled_scale;
@@ -23,7 +21,7 @@ int main(int argc, char *argv[]) {
         string test_file_path;
         if (argc > 1) {
             test_file_path = argv[1];
-        } else if (num != 2 && num != 6 && num != 0) {
+        } else if (num != 2 && num != 0) {
             cout << "Please enter the path of the point cloud file (.ply): ";
             cin >> test_file_path;
         }
@@ -62,10 +60,6 @@ int main(int argc, char *argv[]) {
                 cout << "Please enter the Please input sampling scale(e.g. 0.2): ";
                 cin >> sampled_scale;
                 cv::_3d::farthestPointSamplingSample(test_file_path, sampled_scale);
-                break;
-            case 6:
-                testing::InitGoogleTest();
-                RUN_ALL_TESTS();
                 break;
             default:
                 cout << "This sample does not exist.\n";
