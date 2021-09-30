@@ -46,7 +46,8 @@ TEST_F(SAMPLING, RandomSampling) {
 
 TEST_F(SAMPLING, FarthestPointSampling) {
     cv::_3d::farthestPointSampling(sampling_point_cloud, 2, sampled_pts);
-    ASSERT_TRUE(sampled_pts.row(0).dot(sampled_pts.row(1)) == 0)
-                                << "FPS did not get the farthest point in the point cloud.";
+    cv::Mat check = sampled_pts.row(0) + sampled_pts.row(1);
+    bool tmp = check.at<float>(0, 0) == check.at<float>(0, 1) == check.at<float>(0, 2) == 1;
+    ASSERT_TRUE(tmp) << "FPS did not get the farthest point in the point cloud.";
 }
 
