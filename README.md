@@ -1,5 +1,10 @@
 # OpenCV 3D
 
+[![language](https://img.shields.io/github/languages/top/Ryyyc/opencv_3d?color=%23330099)]()
+[![commit activity](https://img.shields.io/github/commit-activity/m/Ryyyc/opencv_3d)](https://github.com/Ryyyc/opencv_3d/commits/master)
+[![code size](https://img.shields.io/github/languages/code-size/Ryyyc/opencv_3d?color=%230099CC)]()
+[![repo size](https://img.shields.io/github/repo-size/Ryyyc/opencv_3d?color=%23CC9900)]()
+
 <br>
 
 ## Brief
