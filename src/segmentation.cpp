@@ -1,5 +1,5 @@
 #include "opencv2/opencv_3d/segmentation.hpp"
-#include "opencv2/opencv_3d/plane_utils.hpp"
+#include "opencv2/opencv_3d/ptcloud_utils.hpp"
 #include "opencv2/opencv_3d/sampling.hpp"
 
 namespace cv {
@@ -125,7 +125,7 @@ void ransacFitPlanes(cv::InputArray &input_pts, float thr, int max_iterations,
     {
         cv::Mat pts_plane_fit; // Point cloud used to find a plane every time
         if (grid_size > 0)
-            cv::_3d::voxelGrid(pts, grid_size, grid_size, grid_size, pts_plane_fit);
+            cv::_3d::voxelGridSampling(pts_plane_fit, pts, grid_size, grid_size, grid_size);
         else
             pts_plane_fit = pts;
 

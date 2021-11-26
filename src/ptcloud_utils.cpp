@@ -1,4 +1,4 @@
-#include "opencv2/opencv_3d/plane_utils.hpp"
+#include "opencv2/opencv_3d/ptcloud_utils.hpp"
 
 namespace cv {
 namespace _3d {
@@ -128,11 +128,12 @@ int getPlaneInliers(const cv::Vec4f &plane_coeffs, const cv::Mat &input_pts, flo
 //                }
 //            });
 
+    float thr_right = thr - d, thr_left = -thr - d;
     for (int i = 0; i < pts_size; ++i)
     {
         float *const pts_ptr_base = pts_ptr + 3 * i;
-        float dist = a * (*(pts_ptr_base)) + b * (*(pts_ptr_base + 1)) + c * (*(pts_ptr_base + 2)) + d;
-        if (dist < thr && dist > -thr)
+        float dist_minus_d = a * (*(pts_ptr_base)) + b * (*(pts_ptr_base + 1)) + c * (*(pts_ptr_base + 2));
+        if (dist_minus_d > thr_left && dist_minus_d < thr_right)
         {
             inliers[i] = true;
             ++num_inliers;

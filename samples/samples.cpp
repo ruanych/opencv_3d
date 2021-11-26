@@ -1,7 +1,7 @@
 #include <iostream>
 #include <opencv2/core.hpp>
 #include "opencv2/opencv_3d/sampling.hpp"
-#include "opencv2/opencv_3d/plane_utils.hpp"
+#include "opencv2/opencv_3d/ptcloud_utils.hpp"
 #include "opencv2/opencv_3d/segmentation.hpp"
 #include "samples.hpp"
 #include "utils.hpp"
@@ -21,14 +21,14 @@ void voxelGridSamplingSample(const std::string &test_file_path, float grid_size)
 
             cv::Mat sampled_pts;
             clock_t start = clock();
-            cv::_3d::voxelGrid(point_cloud, grid_size, grid_size, grid_size, sampled_pts);
+            cv::_3d::voxelGridSampling(sampled_pts, point_cloud, grid_size, grid_size, grid_size);
             clock_t end = clock();
             std::cout << "After sampled, point cloud size: " << sampled_pts.size << std::endl;
             std::cout << "Sampling time cost: " << (1000.0 * (end - start)) / CLOCKS_PER_SEC << " ms" << std::endl;
             if (savePointCloudPly(test_file_path + std::to_string(grid_size) + "-voxel-sampled.ply", sampled_pts, true))
             {
                 std::cout << "Save sampled point cloud successful, location: "
-                          << test_file_path + std::to_string(grid_size) + "-voxel-sampled.ply" << std::endl;;
+                          << test_file_path + std::to_string(grid_size) + "-voxel-sampled.ply" << std::endl;
             }
         }
     }
@@ -52,7 +52,7 @@ void randomSamplingSample(const std::string &test_file_path, float sampled_scale
 
             cv::Mat sampled_pts;
             clock_t start = clock();
-            cv::_3d::randomSampling(point_cloud, sampled_scale, sampled_pts);
+            cv::_3d::randomSampling(sampled_pts, point_cloud, sampled_scale);
             clock_t end = clock();
             std::cout << "After sampled, point cloud size: " << sampled_pts.size << std::endl;
             std::cout << "Sampling time cost: " << (1000.0 * (end - start)) / CLOCKS_PER_SEC << " ms" << std::endl;
@@ -60,7 +60,7 @@ void randomSamplingSample(const std::string &test_file_path, float sampled_scale
                                   true))
             {
                 std::cout << "Save sampled point cloud successful, location: "
-                          << test_file_path + std::to_string(sampled_scale) + "-random-sampled.ply" << std::endl;;
+                          << test_file_path + std::to_string(sampled_scale) + "-random-sampled.ply" << std::endl;
             }
         }
     }
@@ -84,7 +84,7 @@ void farthestPointSamplingSample(const std::string &test_file_path, float sample
 
             cv::Mat sampled_pts;
             clock_t start = clock();
-            cv::_3d::farthestPointSampling(point_cloud, sampled_scale, sampled_pts);
+            cv::_3d::farthestPointSampling(sampled_pts, point_cloud, sampled_scale);
             clock_t end = clock();
             std::cout << "After sampled, point cloud size: " << sampled_pts.size << std::endl;
             std::cout << "Sampling time cost: " << (1000.0 * (end - start)) / CLOCKS_PER_SEC << " ms" << std::endl;
@@ -92,7 +92,7 @@ void farthestPointSamplingSample(const std::string &test_file_path, float sample
                                   true))
             {
                 std::cout << "Save sampled point cloud successful, location: "
-                          << test_file_path + std::to_string(sampled_scale) + "-fps-sampled.ply" << std::endl;;
+                          << test_file_path + std::to_string(sampled_scale) + "-fps-sampled.ply" << std::endl;
             }
         }
     }
