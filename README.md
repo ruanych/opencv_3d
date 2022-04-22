@@ -13,6 +13,36 @@ This repository implements some algorithms related to point clouds and is develo
 
 <br>
 
+## Using OpenCV 5.x
+
+It's worth celebrating that the features implemented in this repository have been merged into the [OpenCV 5.x](https://github.com/opencv/opencv/tree/5.x) branch 3D module!
+
+Related PR in:
++ **Add 3D point cloud sampling functions to branch next.** https://github.com/opencv/opencv/pull/20784
++ **Accelerated 3D point cloud Farthest Point Sampling calculation using SIMD.** https://github.com/opencv/opencv/pull/21095
++ **Add support for 3D point cloud segmentation, using the USAC framework.** https://github.com/opencv/opencv/pull/21276
+
+Related documents:
++ [Voxel Grid Filter Sampling](https://docs.opencv.org/5.x/da/d35/group____3d.html#gab6d76c33aa5eaa7b3ccf9014ee4edd1f)
++ [Random Sampling](https://docs.opencv.org/5.x/da/d35/group____3d.html#ga8cb1668dbf485cb6846f236f6f21b1d8)
++ [Farthest Point Sampling](https://docs.opencv.org/5.x/da/d35/group____3d.html#ga8bb3404745267f0a90d4fb8f537bdd87)
++ [RANSAC based on USAC framework](https://docs.opencv.org/5.x/da/de6/classcv_1_1SACSegmentation.html)
+
+
+<br>
+
+Both the farthest point sampling algorithm and the USAC framework have added SIMD support, so if you want to take full advantage of SIMD optimization, you can refer to the [OpenCV configuration options reference](https://docs.opencv.org/5.x/db/d05/tutorial_config_reference.html).
+
+> **CPU optimization level**
+> 
+> On x86_64 machines the library will be compiled for SSE3 instruction set level by default. This level can be changed by configuration option:
+> ```
+> cmake -DCPU_BASELINE=AVX2 ../opencv
+> ```
+
+
+<br>
+
 ## Quick Start
 
 ```shell
