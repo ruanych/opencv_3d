@@ -1,9 +1,9 @@
 # OpenCV 3D
 
-[![language](https://img.shields.io/github/languages/top/Ryyyc/opencv_3d?color=%23330099)]()
-[![commit activity](https://img.shields.io/github/commit-activity/m/Ryyyc/opencv_3d)](https://github.com/Ryyyc/opencv_3d/commits/master)
-[![code size](https://img.shields.io/github/languages/code-size/Ryyyc/opencv_3d?color=%230099CC)]()
-[![repo size](https://img.shields.io/github/repo-size/Ryyyc/opencv_3d?color=%23CC9900)]()
+[![language](https://img.shields.io/github/languages/top/ruanych/opencv_3d?color=%23330099)]()
+[![commit activity](https://img.shields.io/github/commit-activity/m/ruanych/opencv_3d)](https://github.com/ruanych/opencv_3d/commits/master)
+[![code size](https://img.shields.io/github/languages/code-size/ruanych/opencv_3d?color=%230099CC)]()
+[![repo size](https://img.shields.io/github/repo-size/ruanych/opencv_3d?color=%23CC9900)]()
 
 <br>
 
@@ -46,7 +46,7 @@ Both the farthest point sampling algorithm and the USAC framework have added SIM
 ## Quick Start
 
 ```shell
-git clone https://github.com/Ryyyc/opencv_3d.git
+git clone https://github.com/ruanych/opencv_3d.git
 mkdir opencv_3d/build && cd opencv_3d/build
 cmake ..
 make
